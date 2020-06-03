@@ -15,6 +15,7 @@ namespace WindowsFormsApp1
         private delegate void DelegateSetPicture(Bitmap image);
         private DelegateSetPicture DelegateSetPictureFunction;
         FormDeskTop formDeskTop;
+        private readonly object picLock = new object();
         public Form1()
         {
             InitializeComponent();
@@ -37,7 +38,10 @@ namespace WindowsFormsApp1
         {
             if (this.pictureBox1.InvokeRequired)
             {
-                this.pictureBox1.Invoke(this.DelegateSetPictureFunction, new object[] { image });
+                lock (this.picLock)
+                {
+                    this.Invoke(this.DelegateSetPictureFunction, new object[] { image });
+                }
                 return;
             }
             Image destroyBitMap = null;

@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsFormsApp1.Properties;
@@ -17,6 +18,7 @@ namespace WindowsFormsApp1
         private int MinTop = 0;
         private Size BmpSize;
         private Form1 Form1;
+        private readonly object picLock = new object();
 
         private delegate void DelegateSetPicture(Bitmap image);
         DelegateSetPicture delSetPicture;
@@ -31,11 +33,16 @@ namespace WindowsFormsApp1
         {
             if (this.pictureBox1.InvokeRequired)
             {
-                this.pictureBox1.Invoke(this.delSetPicture, new object[] { image });
+                lock (this.picLock)
+                {
+                    this.Invoke(this.delSetPicture, new object[] { image });
+                }
                 return;
+
             }
+
             Image destroyBitMap = null;
-            if(null != this.pictureBox1.Image)
+            if (null != this.pictureBox1.Image)
             {
                 destroyBitMap = this.pictureBox1.Image;
             }
@@ -74,8 +81,7 @@ namespace WindowsFormsApp1
 
                         graphics.DrawImage(Resources.Cursol, mousePoint);
                     }
-
-                    Invoke(delSetPicture, new object[] { wallPaperBmp });
+                    this.SetPicture(wallPaperBmp);
 
                     //切り取る部分の範囲を決定する。マウスの位置を中心とする
                     Rectangle srcRect = new Rectangle(Math.Abs(this.MinLeft) + MousePosition.X - this.Form1.PictureSize.Width / 2, Math.Abs(this.MinTop) + MousePosition.Y - this.Form1.PictureSize.Height / 2, this.Form1.PictureSize.Width, this.Form1.PictureSize.Height);
@@ -86,8 +92,9 @@ namespace WindowsFormsApp1
                     }
 
                     this.Form1.SetControlPicturePub(controlBitMap);
+
                 }
-                catch (Exception exception)
+                catch (Exception)
                 {
                     continue;
                 }
