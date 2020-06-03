@@ -60,6 +60,7 @@
     <Compile Include="FormDeskTop.Designer.cs">
       <DependentUpon>FormDeskTop.cs</DependentUpon>
     </Compile>
+    <Compile Include="model\FormPropertyModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

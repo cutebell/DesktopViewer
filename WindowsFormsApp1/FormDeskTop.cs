@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowsFormsApp1.model;
 using WindowsFormsApp1.Properties;
 
 namespace WindowsFormsApp1
@@ -17,15 +18,15 @@ namespace WindowsFormsApp1
         private int MinLeft = 0;
         private int MinTop = 0;
         private Size BmpSize;
-        private Form1 Form1;
+        private FormPropertyModel formPropertyModel;
         private readonly object picLock = new object();
 
         private delegate void DelegateSetPicture(Bitmap image);
         DelegateSetPicture delSetPicture;
-        public FormDeskTop(Form1 form1)
+        public FormDeskTop(FormPropertyModel formPropertyModel)
         {
             InitializeComponent();
-            this.Form1 = form1;
+            this.formPropertyModel = formPropertyModel;
             this.delSetPicture = new DelegateSetPicture(this.SetPicture);
         }
 
@@ -33,10 +34,7 @@ namespace WindowsFormsApp1
         {
             if (this.pictureBox1.InvokeRequired)
             {
-                lock (this.picLock)
-                {
-                    this.Invoke(this.delSetPicture, new object[] { image });
-                }
+                this.Invoke(this.delSetPicture, new object[] { image });
                 return;
 
             }
@@ -47,6 +45,7 @@ namespace WindowsFormsApp1
                 destroyBitMap = this.pictureBox1.Image;
             }
             this.pictureBox1.Image = image;
+            this.pictureBox1.Refresh();
 
             if (null != destroyBitMap)
             {
@@ -62,7 +61,7 @@ namespace WindowsFormsApp1
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
 
-            Rectangle desRect = new Rectangle(0, 0, this.Form1.PictureSize.Width, this.Form1.PictureSize.Height);
+            Rectangle desRect = new Rectangle(0, 0, this.formPropertyModel.PictureSize.Width, this.formPropertyModel.PictureSize.Height);
             
             while (!this.backgroundWorker1.CancellationPending)
             {
@@ -84,14 +83,14 @@ namespace WindowsFormsApp1
                     this.SetPicture(wallPaperBmp);
 
                     //切り取る部分の範囲を決定する。マウスの位置を中心とする
-                    Rectangle srcRect = new Rectangle(Math.Abs(this.MinLeft) + MousePosition.X - this.Form1.PictureSize.Width / 2, Math.Abs(this.MinTop) + MousePosition.Y - this.Form1.PictureSize.Height / 2, this.Form1.PictureSize.Width, this.Form1.PictureSize.Height);
-                    Bitmap controlBitMap = new Bitmap(this.Form1.PictureSize.Width, this.Form1.PictureSize.Height);
+                    Rectangle srcRect = new Rectangle(Math.Abs(this.MinLeft) + MousePosition.X - this.formPropertyModel.PictureSize.Width / 2, Math.Abs(this.MinTop) + MousePosition.Y - this.formPropertyModel.PictureSize.Height / 2, this.formPropertyModel.PictureSize.Width, this.formPropertyModel.PictureSize.Height);
+                    Bitmap controlBitMap = new Bitmap(this.formPropertyModel.PictureSize.Width, this.formPropertyModel.PictureSize.Height);
                     using (Graphics graphics = Graphics.FromImage(controlBitMap))
                     {
                         graphics.DrawImage(wallPaperBmp, desRect, srcRect, GraphicsUnit.Pixel);
                     }
 
-                    this.Form1.SetControlPicturePub(controlBitMap);
+                   this.formPropertyModel.DelegateSetPicture(controlBitMap);
 
                 }
                 catch (Exception)

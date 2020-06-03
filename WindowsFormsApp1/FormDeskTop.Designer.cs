@@ -54,9 +54,13 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(998, 423);
+            this.ControlBox = false;
             this.Controls.Add(this.pictureBox1);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "FormDeskTop";
-            this.Text = "FormDeskTop";
+            this.ShowInTaskbar = false;
+            this.Text = "ビューア";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.FormDeskTop_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
